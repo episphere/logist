@@ -43,9 +43,14 @@
             let fr=new FileReader(); 
             fr.onload=function(){
                 const txt = this.result
-                console.log(txt) 
+                console.log(txt)
+                new logist(txt)
             }
             fr.readAsText(loadFile.files[0]);
+        }
+        loadUrl.onclick=async function(){
+            const txt = await (await fetch(dataUrl.value)).text()
+            new logist(txt)
         }
     </script>
 </body>
