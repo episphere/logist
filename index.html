@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Logist</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/3.0.13/bootstrap-native.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="logist.css" rel="stylesheet">
+</head>
+<body class="container">
+    <h1>epiLogist <span style="font-size:">[<>code]</span></h1>
+    <p>Experimenting with in-browser logistic regression</p>
+    <h2>Load Data</h2>
+    <p>
+    <input size=30 id="dataUrl" style="color:green"> <button id="loadUrl">load url</button> <span id="dataLinkOut" style="color:blue;cursor:pointer" hidden=true>&#8599;</span> <button id="loadDemoData">Demo</button>
+    <br><input type="file" id="loadFile"> 
+    </p>
+    <script src="logist.js"></script>
+    <script>
+        // for UI event orchestration, the "real js" is at logist.js
+        dataUrl.onkeyup=function(){
+            dataLinkOut.hidden=false
+        }
+        dataLinkOut.onclick=function(){
+            window.open(dataUrl.value)
+        }
+        loadDemoData.onclick=function(){
+            dataUrl.style.backgroundColor='yellow'
+            setTimeout(_=>{
+                dataUrl.value='test1.txt'
+                dataUrl.style.backgroundColor=''
+                loadUrl.style.backgroundColor='yellow'
+                setTimeout(_=>{
+                    loadUrl.click()
+                    loadUrl.style.backgroundColor=''
+                    dataUrl.onkeyup()
+                },1000)
+            },500)           
+        }
+        loadFile.onchange=evt=>{
+            let fr=new FileReader(); 
+            fr.onload=function(){
+                const txt = this.result
+                console.log(txt) 
+            }
+            fr.readAsText(loadFile.files[0]);
+        }
+    </script>
+</body>
+</html>
