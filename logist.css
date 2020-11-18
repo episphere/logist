@@ -12,6 +12,10 @@ h2 {
     color:brown
 }
 
+th, td {
+  padding: 2px;
+}
+
 a:hover {
     background-color:yellow;
     color:green
