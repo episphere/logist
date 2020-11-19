@@ -16,6 +16,10 @@ th, td {
   padding: 2px;
 }
 
+td {
+  color:blue
+}
+
 a:hover {
     background-color:yellow;
     color:green
