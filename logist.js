@@ -16,12 +16,22 @@ logist.parse=txt=>{
     dt.cols=tb[0]
     dt.rows=tb.slice(1).map(x=>x[0])
     dt.x=tb.slice(1).map(x=>x.slice(1,-1))
-    dt.x=logist.transpose(dt.x.map(x=>x.map(x=>parseInt(x))))
+    //dt.x=logist.transpose(dt.x.map(x=>x.map(x=>parseInt(x))))
+    dt.x=logist.transpose(dt.x)
     dt.y=tb.slice(1).map(x=>x.slice(-1))
     dt.y=dt.y.map(x=>parseInt(x[0]))
-    dt.b=dt.cols.slice(1,-1).map(_=>NaN)
     dt.min = dt.x.map(xi=>Math.min(...xi))
     dt.max = dt.x.map(xi=>Math.max(...xi))
+    dt.b=dt.cols.slice(1,-1).map(_=>NaN) // initializing
+    // aleles
+    dt.aleles=[]
+    dt.xx=[]
+    dt.cols.slice(1,-1).forEach((c,i)=>{
+        [...new Set(dt.x[i])].sort().forEach(a=>{
+            dt.aleles.push(c+'#'+a)
+            dt.xx.push((dt.x[i]).map(x=>(x==a)*1))
+        })
+    })
     return dt
 }
 
