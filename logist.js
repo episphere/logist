@@ -23,12 +23,12 @@ logist.parse=txt=>{
     dt.min = dt.x.map(xi=>Math.min(...xi))
     dt.max = dt.x.map(xi=>Math.max(...xi))
     dt.b=dt.cols.slice(1,-1).map(_=>NaN) // initializing
-    // aleles
-    dt.aleles=[]
+    // alleles
+    dt.alleles=[]
     dt.xx=[]
     dt.cols.slice(1,-1).forEach((c,i)=>{
         [...new Set(dt.x[i])].sort().forEach(a=>{
-            dt.aleles.push(c+'#'+a)
+            dt.alleles.push(c+'#'+a)
             dt.xx.push((dt.x[i]).map(x=>(x==a)*1))
         })
     })
