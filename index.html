@@ -53,6 +53,12 @@
             const txt = await (await fetch(dataUrl.value)).text()
             new logist(txt)
         }
+        // look for file in hash
+        if(location.hash.length>2){
+            dataUrl.value=location.hash.slice(1)
+            dataLinkOut.hidden=false
+            loadUrl.click()
+        }
     </script>
 </body>
 </html>

@@ -53,7 +53,7 @@ logist.ui=(div='logistDiv')=>{
     }
     let h = `<p style="color:green">Started: ${Date()}</p>`
     h+='<h2>Logistic regression</h2>'
-    h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # ${logist.dt.alleles.length} x ${logist.dt.pids.length} observations</p>`
+    h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # ${logist.dt.alleles.length} alleles x ${logist.dt.pids.length} outcomes</p>`
     h+='<div id="regressionDiv">...</div>'
     div.innerHTML=h
     let divR=document.getElementById('regressionDiv')
@@ -68,7 +68,12 @@ logist.ui=(div='logistDiv')=>{
     //td0.style.textAlign='center'
     td0.style.color='darkgreen'
     let th01 = document.createElement('th')
-    th01.textContent=logist.dt.y.join('') // outcome
+    let y = logist.dt.y
+    if(y.length>50){
+        y=y.slice(0,50)
+        y.push('...')
+    }
+    th01.textContent=y.join('') // outcome
     tr0.appendChild(th01)
     /*
     const hh = ['min','max','b']
@@ -78,14 +83,28 @@ logist.ui=(div='logistDiv')=>{
         th.textContent=x
     })
     */
-    logist.dt.alleles.forEach((x,i)=>{
+    let alleles = logist.dt.alleles
+    let xx = logist.dt.xx
+    if(logist.dt.alleles.length>10){
+        alleles = logist.dt.alleles.slice(0,10)
+        xx = logist.dt.xx.slice(0,10)
+        alleles.push('...')
+        xx.push(['.','.','.'])
+    }
+    if(xx[0].length>50){
+        xx=xx.map(r=>{
+            return r.slice(0,50).concat('...')
+        })
+
+    }
+    alleles.forEach((x,i)=>{
         let tr = document.createElement('tr')
         tb.appendChild(tr)
         let th = document.createElement('th')
         th.textContent=x
         tr.appendChild(th)
         let td01 = document.createElement('td')
-        td01.textContent=logist.dt.xx[i].join('')
+        td01.textContent=xx[i].join('')
         tr.appendChild(td01)
         /*
         hh.forEach(f=>{
