@@ -52,11 +52,13 @@ logist.ui=(div='logistDiv')=>{
         div=document.getElementById(div)
     }
     let h = `<p style="color:green">Started: ${Date()}</p>`
-    h+='<h2>Logistic regression</h2>'
+    h+='<h2>Data preview</h2>'
     h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # ${logist.dt.alleles.length} alleles x ${logist.dt.pids.length} outcomes</p>`
-    h+='<div id="regressionDiv">...</div>'
+    h+='<div id="dataPreviewDiv">...</div>'
+    h+='<h2>Univariate Regression</h2>'
+    h+='<div id="univariateRegressionDiv">...</div>'
     div.innerHTML=h
-    let divR=document.getElementById('regressionDiv')
+    let divR=document.getElementById('dataPreviewDiv')
     divR.innerHTML=''
     let tb = document.createElement('table')
     divR.appendChild(tb)
