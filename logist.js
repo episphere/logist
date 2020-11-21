@@ -57,6 +57,7 @@ logist.ui=(div='logistDiv')=>{
     h+='<div id="dataPreviewDiv">...</div>'
     h+='<h2>Univariate Regression</h2>'
     h+='<div id="univariateRegressionDiv">...</div>'
+    h+='<div id="showcaseLogistDiv">...</div>'
     div.innerHTML=h
     let divR=document.getElementById('dataPreviewDiv')
     divR.innerHTML=''
@@ -116,4 +117,17 @@ logist.ui=(div='logistDiv')=>{
         })
         */
     })
+    logist.showcaseLogist()
+}
+
+logist.showcaseLogist=(div="showcaseLogistDiv")=>{ // showcase logistic regressions with iris
+    if(typeof(div)=='string'){
+        div=document.getElementById(div)
+    }
+    div=div||document.createElement('div')
+    div.id="showcaseLogist"
+    h='<h2>Showcasing logistic regression</h2>'
+    h+='<table><tr><td id="data"><textarea id="dataArea" rows="10"></textarea></td><td id="calc"></td></tr></table>'
+    div.innerHTML=h
+    return div
 }
