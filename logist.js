@@ -51,8 +51,8 @@ logist.ui=(div='logistDiv')=>{
     if(typeof(div)=='string'){
         div=document.getElementById(div)
     }
-    let h = `<p style="color:green">Started: ${Date()}</p>`
-    h+='<h2>Data preview</h2>'
+    //let h = `<p style="color:green">Started: ${Date()}</p>`
+    h='<h2>Data preview</h2>'
     h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # ${logist.dt.alleles.length} alleles x ${logist.dt.pids.length} outcomes</p>`
     h+='<div id="dataPreviewDiv">...</div>'
     h+='<h2>Univariate Regression</h2>'
@@ -127,7 +127,7 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     div=div||document.createElement('div')
     if(div.id.length==0){div.id="showcaseLogistDiv"}
     h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
-    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="10"></textarea></td><td id="calc"></td></tr></table>'
+    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="10"></textarea><br><button id="irisPlotBt">Plot</button> <button id="irisRegressionBt">Regression</button></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
     // get iris data
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
@@ -135,9 +135,9 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     h+='<h3>Independent variable</h3>'
     div.indVars.forEach((k,i)=>{
         if(i==0){
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" value="${k}" class="irisVar" checked=true>`
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" value="${k}" class="irisVar" onchange="logist.getIrisSelectionData()" checked=true>`
         }else{
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" class="irisVar" value="${k}">`
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" class="irisVar" onchange="logist.getIrisSelectionData()" value="${k}">`
         }        
     })
     h+='</p>'
@@ -145,9 +145,9 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     h+='Species: '
     div.species.forEach((k,i)=>{
         if(i==0){
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" value="${k}"checked=true>`
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"checked=true>`
         }else{
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" value="${k}">`
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}">`
         }
     })
     div.innerHTML=h
@@ -156,10 +156,52 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
 }
 
 logist.getIrisSelectionData=(div=document.getElementById("showcaseLogistDiv"))=>{
+    //console.log(Date())
     const varName = [...div.getElementsByClassName('irisVar')].filter(x=>x.checked)[0].value
     const className = [...div.getElementsByClassName('irisSpecies')].filter(x=>x.checked)[0].value
     // fill text area
     let txt=`${varName}\t${className}\n`
-    txt += div.iris.map(xy=>[xy[varName],1*(xy.species==className)].join('\t')).join('\n')
+    // sort array by value of selected variable
+    div.iris.sort((a,b)=>{
+        if(a[varName]<b[varName]){
+            return -1
+        }else{
+            return 1
+        }
+    })
+    txt += div.iris.map(xy=>[xy[varName],1*(xy.species==className),NaN].join('\t')).join('\n')
     dataArea.textContent=txt
+    logist.irisPlot()
+}
+
+logist.irisPlot=(div=document.getElementById('irisPlotDiv'))=>{
+    // extract data from text area
+    let dt = dataArea.value.split('\n').map(x=>x.split('\t'))
+    let Xlabel = dt[0][0]
+    let Ylabel = dt[0][1]
+    let x=[]
+    let obs=[]
+    let pred=[]
+    dt.slice(1).forEach((r,i)=>{
+        x.push(parseFloat(r[0]))
+        obs.push(parseFloat(r[1]))
+        pred.push(parseFloat(r[2]))
+    })
+    traceObs = {
+        x:x,
+        y:obs,
+        name:'observed',
+        mode: 'markers'
+    }
+    tracePred = {
+        x:x,
+        y:pred,
+        name:'predicted',
+        mode: 'lines'
+    }
+    traces = [traceObs,tracePred]
+    Plotly.newPlot(div,traces,{
+        width: 500
+    })
+    return traces
 }
