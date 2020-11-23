@@ -12,6 +12,11 @@ h2 {
     color:brown
 }
 
+h3 {
+    font-size:medium;
+    color:darkgreen
+}
+
 th, td {
   padding: 2px;
 }

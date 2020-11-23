@@ -120,14 +120,46 @@ logist.ui=(div='logistDiv')=>{
     logist.showcaseLogist()
 }
 
-logist.showcaseLogist=(div="showcaseLogistDiv")=>{ // showcase logistic regressions with iris
+logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic regressions with iris
     if(typeof(div)=='string'){
         div=document.getElementById(div)
     }
     div=div||document.createElement('div')
-    div.id="showcaseLogist"
-    h='<h2>Showcasing logistic regression</h2>'
-    h+='<table><tr><td id="data"><textarea id="dataArea" rows="10"></textarea></td><td id="calc"></td></tr></table>'
+    if(div.id.length==0){div.id="showcaseLogistDiv"}
+    h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
+    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="10"></textarea></td><td id="calc"></td></tr></table>'
+    // get iris data
+    div.iris = await (await fetch('../ai/data/iris.json')).json() 
+    div.indVars=Object.keys(div.iris[0]).slice(0,-1)
+    div.species=[...new Set(showcaseLogistDiv.iris.map(x=>x.species))]
+    h+='<h3>Independent variable</h3>'
+    div.indVars.forEach((k,i)=>{
+        if(i==0){
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" value="${k}" class="irisVar" checked=true>`
+        }else{
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" class="irisVar" value="${k}">`
+        }        
+    })
+    h+='</p>'
+    h+='<h3>Classification</h3>'
+    h+='Species: '
+    div.species.forEach((k,i)=>{
+        if(i==0){
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" value="${k}"checked=true>`
+        }else{
+            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" value="${k}">`
+        }
+    })
     div.innerHTML=h
+    setTimeout(logist.getIrisSelectionData,100)
     return div
+}
+
+logist.getIrisSelectionData=(div=document.getElementById("showcaseLogistDiv"))=>{
+    const varName = [...div.getElementsByClassName('irisVar')].filter(x=>x.checked)[0].value
+    const className = [...div.getElementsByClassName('irisSpecies')].filter(x=>x.checked)[0].value
+    // fill text area
+    let txt=`${varName}\t${className}\n`
+    txt += div.iris.map(xy=>[xy[varName],1*(xy.species==className)].join('\t')).join('\n')
+    dataArea.textContent=txt
 }
