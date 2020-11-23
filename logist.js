@@ -127,7 +127,7 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     div=div||document.createElement('div')
     if(div.id.length==0){div.id="showcaseLogistDiv"}
     h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
-    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="10"></textarea><br><button id="irisPlotBt">Plot</button> <button id="irisRegressionBt">Regression</button></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
+    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="10"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt">Regression</button></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
     // get iris data
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
@@ -201,7 +201,11 @@ logist.irisPlot=(div=document.getElementById('irisPlotDiv'))=>{
     }
     traces = [traceObs,tracePred]
     Plotly.newPlot(div,traces,{
-        width: 500
+        width: 500,
+        title:Ylabel,
+        xaxis:{
+            title:Xlabel
+        }
     })
     return traces
 }
