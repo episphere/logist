@@ -22,7 +22,7 @@ logist.parse=txt=>{
     dt.y=dt.y.map(x=>parseInt(x[0]))
     dt.min = dt.x.map(xi=>Math.min(...xi))
     dt.max = dt.x.map(xi=>Math.max(...xi))
-    dt.b=dt.cols.slice(1,-1).map(_=>NaN) // initializing
+    //dt.b=dt.cols.slice(1,-1).map(_=>NaN) // initializing
     // alleles
     dt.alleles=[]
     dt.xx=[]
@@ -199,8 +199,16 @@ logist.irisPlot=(P,div)=>{
     tracePred = {
         x:x,
         y:pred,
-        name:'predicted',
+        name:'model',
         mode: 'lines'
+    }
+    if(P){
+        let min = Math.min(...x)
+        let max = Math.max(...x)
+        let n = 200
+        let step = (max-min)/n
+        tracePred.x = [...Array(n+1)].map((_,i)=>min+step*i)
+        tracePred.y = logist.fun(tracePred.x,P)
     }
     traces = [traceObs,tracePred]
     let parmTxt = Ylabel
@@ -214,7 +222,7 @@ logist.irisPlot=(P,div)=>{
         yaxis:{
             title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>P<sub>0</sub>+P<sub>1*</sub>x</sup></sub></span>'
         }
-    },{displayModeBar: false,})
+    },{displayModeBar: false})
     return traces
 }
 
