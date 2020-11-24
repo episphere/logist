@@ -127,7 +127,7 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     div=div||document.createElement('div')
     if(div.id.length==0){div.id="showcaseLogistDiv"}
     h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
-    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="20"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt" onclick="logist.irisRegression()">Regression</button></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
+    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="20"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt" onclick="logist.irisRegression()">Regression</button><br><span style="color:black;font-size:x-small">you can edit/paste in your own data</span></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
     // get iris data
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
@@ -145,9 +145,9 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     h+='Species: '
     div.species.forEach((k,i)=>{
         if(i==0){
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"checked=true>`
+            h+=` <input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"checked=true>${k}`
         }else{
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}">`
+            h+=` <input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}">${k}`
         }
     })
     div.innerHTML=h
@@ -175,7 +175,8 @@ logist.getIrisSelectionData=(div=document.getElementById("showcaseLogistDiv"))=>
     //logist.irisPlot()
 }
 
-logist.irisPlot=(div=document.getElementById('irisPlotDiv'))=>{
+logist.irisPlot=(P,div)=>{
+    div=div||document.getElementById('irisPlotDiv')
     // extract data from text area
     let dt = dataArea.value.split('\n').map(x=>x.split('\t'))
     let Xlabel = dt[0][0]
@@ -204,9 +205,12 @@ logist.irisPlot=(div=document.getElementById('irisPlotDiv'))=>{
     traces = [traceObs,tracePred]
     Plotly.newPlot(div,traces,{
         width: 500,
-        title:Ylabel,
+        title:`${Ylabel}<br><span style="font-size:x-small">P=${JSON.stringify(P.map(n=>n.toExponential(4))).replace(/"/g,'')}</span>`,
         xaxis:{
             title:Xlabel
+        },
+        yaxis:{
+            title:'y= 1 / (1+exp(P0+P1*x))'
         }
     },{displayModeBar: false,})
     return traces
@@ -220,22 +224,29 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
         x.push(parseFloat(r[0]))
         y.push(parseFloat(r[1]))
     })
+    /*
     let fun=function(x,P){
         //return P[0]/(1+Math.exp(P[1]*x-P[2]))
         return x.map(xi=>1/(1+Math.exp(P[0]*xi-P[1])))
     }
+    */
     let Pini=[Math.random(),Math.random()]
     //let Pini=ta.P||[Math.random(),Math.random()]
     //let Pini=[5,30]
-    let P = fminsearch(fun,Pini,x,y,{maxIter:10000,display:false})
+    let P = fminsearch(logist.fun,Pini,x,y,{maxIter:10000,display:false})
     //console.log(P)
-    let yp = fun(x,P)
+    let yp = logist.fun(x,P)
     let txt = dtxt[0].join('\t')
     x.forEach((xi,i)=>{
         txt +=`\n${xi}\t${y[i]}\t${(Math.round(yp[i]*1000)/1000).toString()}`
     })
     ta.P=P
     ta.value=txt
-    logist.irisPlot()
+    logist.irisPlot(P)
     return ta
+}
+
+logist.fun=function(x,P){
+    //return P[0]/(1+Math.exp(P[1]*x-P[2]))
+    return x.map(xi=>1/(1+Math.exp(P[0]+(P[1]*xi))))
 }
