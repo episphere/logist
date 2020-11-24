@@ -104,7 +104,7 @@ logist.ui=(div='logistDiv')=>{
         let tr = document.createElement('tr')
         tb.appendChild(tr)
         let th = document.createElement('th')
-        th.textContent=x
+        th.innerHTML=`<button style="font-size:small" onclick="logist.vizRegressAllele(${i})">${x}</button>`
         tr.appendChild(th)
         let td01 = document.createElement('td')
         td01.textContent=xx[i].join('')
@@ -259,4 +259,17 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
 logist.fun=function(x,P){
     //return P[0]/(1+Math.exp(P[1]*x-P[2]))
     return x.map(xi=>1/(1+Math.exp(P[0]+(P[1]*xi))))
+}
+
+logist.vizRegressAllele=function(i){
+    let x = logist.dt.xx[i]
+    // populate text area
+    let txt = `${logist.dt.alleles[i]}\tcase.vs.control`
+    x.forEach((xj,j)=>{
+        txt+=`\n${xj}\t${logist.dt.y[j]}\tNaN`
+    })
+    dataArea.value=txt
+    setTimeout(function(){irisRegressionBt.click()},100)
+    console.log(logist.dt.alleles[i],{x:x,y:logist.dt.y})
+
 }
