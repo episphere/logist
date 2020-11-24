@@ -172,7 +172,7 @@ logist.getIrisSelectionData=(div=document.getElementById("showcaseLogistDiv"))=>
     txt += div.iris.map(xy=>[xy[varName],1*(xy.species==className),NaN].join('\t')).join('\n')
     dataArea.value=txt
     logist.irisRegression()
-    logist.irisPlot()
+    //logist.irisPlot()
 }
 
 logist.irisPlot=(div=document.getElementById('irisPlotDiv'))=>{
@@ -236,5 +236,6 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
     })
     ta.P=P
     ta.value=txt
+    logist.irisPlot()
     return ta
 }
