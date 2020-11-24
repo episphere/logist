@@ -203,14 +203,16 @@ logist.irisPlot=(P,div)=>{
         mode: 'lines'
     }
     traces = [traceObs,tracePred]
+    let parmTxt = Ylabel
+    if(P){parmTxt=`${Ylabel}<br><span style="font-size:x-small">P=${JSON.stringify(P.map(n=>n.toExponential(4))).replace(/"/g,'')}</span>`}
     Plotly.newPlot(div,traces,{
         width: 500,
-        title:`${Ylabel}<br><span style="font-size:x-small">P=${JSON.stringify(P.map(n=>n.toExponential(4))).replace(/"/g,'')}</span>`,
+        title:parmTxt,
         xaxis:{
             title:Xlabel
         },
         yaxis:{
-            title:'y= 1 / (1+exp(P0+P1*x))'
+            title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>P<sub>0</sub>+P<sub>1*</sub>x</sup></sub></span>'
         }
     },{displayModeBar: false,})
     return traces
