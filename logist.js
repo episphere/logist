@@ -55,7 +55,7 @@ logist.ui=(div='logistDiv')=>{
     h='<h2>Data preview</h2>'
     h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # ${logist.dt.alleles.length} alleles x ${logist.dt.pids.length} outcomes</p>`
     h+='<div id="dataPreviewDiv">...</div>'
-    h+='<h2>Univariate Regression</h2>'
+    h+='<h2>Univariate Regression <button id="univariateRegressionButton" style="font-size:small;color:navy" onclick="logist.UnivarRegress()">Start</button></h2>'
     h+='<div id="univariateRegressionDiv">...</div>'
     h+='<div id="showcaseLogistDiv">...</div>'
     div.innerHTML=h
@@ -220,7 +220,7 @@ logist.irisPlot=(P,div)=>{
             title:Xlabel
         },
         yaxis:{
-            title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>P<sub>0</sub>+P<sub>1*</sub>x</sup></sub></span>'
+            title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>-(P<sub>0</sub>+P<sub>1*</sub>x)</sup></sub></span>'
         }
     },{displayModeBar: false})
     return traces
@@ -258,7 +258,7 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
 
 logist.fun=function(x,P){
     //return P[0]/(1+Math.exp(P[1]*x-P[2]))
-    return x.map(xi=>1/(1+Math.exp(P[0]+(P[1]*xi))))
+    return x.map(xi=>1/(1+Math.exp(-(P[0]+(P[1]*xi)))))
 }
 
 logist.vizRegressAllele=function(i){
@@ -272,4 +272,21 @@ logist.vizRegressAllele=function(i){
     setTimeout(function(){irisRegressionBt.click()},100)
     console.log(logist.dt.alleles[i],{x:x,y:logist.dt.y})
 
+}
+
+logist.UnivarRegress=function(){
+    console.log('univariate regression:\n--------------')
+    univariateRegressionButton.hidden=true
+    univariateRegressionDiv.innerHTML=''
+    let ol = document.createElement('ol')
+    univariateRegressionDiv.appendChild(ol)
+    logist.dt.alleles.forEach((al,i)=>{
+        let li = document.createElement('li')
+        ol.appendChild(li)
+        li.innerHTML=`${al} in preogress ...`
+        setTimeout(function(){
+            let P = fminsearch(logist.fun,[Math.random(),Math.random()],logist.dt.xx[i],logist.dt.y,{maxIter:10000,display:false})
+            li.innerHTML=`<span style="color:navy">${al}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
+        },i*100)
+    })
 }
