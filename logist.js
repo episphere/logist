@@ -14,16 +14,19 @@ logist.parse=txt=>{
     const dt={}
     // header
     dt.cols=tb[0]
-    dt.pids=tb.slice(1).map(x=>x[0])
+    dt.rows=tb.slice(0).map(x=>x[0])
+    //dt.pids=tb.slice(1).map(x=>x[0])
     dt.x=tb.slice(1).map(x=>x.slice(1,-1))
     //dt.x=logist.transpose(dt.x.map(x=>x.map(x=>parseInt(x))))
-    dt.x=logist.transpose(dt.x)
+    dt.x=logist.transpose(dt.x.map(x=>x.map(x=>parseInt(x))))
     dt.y=tb.slice(1).map(x=>x.slice(-1))
     dt.y=dt.y.map(x=>parseInt(x[0]))
+    /*
     dt.min = dt.x.map(xi=>Math.min(...xi))
     dt.max = dt.x.map(xi=>Math.max(...xi))
-    //dt.b=dt.cols.slice(1,-1).map(_=>NaN) // initializing
-    // alleles
+    */
+    //dt.chrs=[...new Set(dt.cols.slice(1).filter(x=>x.match(/^\d+:/)).map(x=>x.match(/^\d+/)[0]))]
+    /*
     dt.alleles=[]
     dt.xx=[]
     dt.cols.slice(1,-1).forEach((c,i)=>{
@@ -33,6 +36,7 @@ logist.parse=txt=>{
         })
     })
     dt.chrs=[...new Set(dt.alleles.map(x=>parseInt(x.match(/^\d+/)[0])))].sort((a,b)=>a>b?1:-1)
+    */
     return dt
 }
 
@@ -53,11 +57,12 @@ logist.ui=(div='logistDiv')=>{
     }
     //let h = `<p style="color:green">Started: ${Date()}</p>`
     h='<h2>Data preview</h2>'
-    h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # ${logist.dt.alleles.length} alleles x ${logist.dt.pids.length} outcomes</p>`
+    //h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # x ${logist.dt.y.length} outcomes</p>`
     h+='<div id="dataPreviewDiv">...</div>'
     h+='<h2>Univariate Regression <button id="univariateRegressionButton" style="font-size:small;color:navy" onclick="logist.UnivarRegress()">Start</button></h2>'
     h+='<div id="univariateRegressionDiv">...</div>'
-    h+='<div id="showcaseLogistDiv">...</div>'
+    //h+='<h2>Logistic regression viz</h1>'
+    h+='<div id="vizLogistDiv">...</div>'
     div.innerHTML=h
     let divR=document.getElementById('dataPreviewDiv')
     divR.innerHTML=''
@@ -67,8 +72,9 @@ logist.ui=(div='logistDiv')=>{
     tb.appendChild(tr0)
     let td0 = document.createElement('td')
     tr0.appendChild(td0)
-    td0.textContent=`${logist.dt.chrs.length}:${logist.dt.cols.length-2}#${logist.dt.alleles.length}x${logist.dt.xx[0].length}` //logist.dt.cols[0]
-    //td0.style.textAlign='center'
+    //td0.textContent=`${logist.dt.chrs.length}:${logist.dt.cols.length-2}x${logist.dt.x[0].length}` //logist.dt.cols[0]
+    td0.textContent=`${logist.dt.x.length} x ${logist.dt.x[0].length}` //logist.dt.cols[0]
+    td0.style.textAlign='center'
     td0.style.color='darkgreen'
     let th01 = document.createElement('th')
     let y = logist.dt.y
@@ -86,11 +92,11 @@ logist.ui=(div='logistDiv')=>{
         th.textContent=x
     })
     */
-    let alleles = logist.dt.alleles
-    let xx = logist.dt.xx
-    if(logist.dt.alleles.length>10){
-        alleles = logist.dt.alleles.slice(0,10)
-        xx = logist.dt.xx.slice(0,10)
+    let alleles = logist.dt.rows.slice(1)
+    let xx = logist.dt.x
+    if(logist.dt.x.length>10){
+        alleles = logist.dt.cols.slice(1,11)
+        xx = logist.dt.x.slice(0,10)
         alleles.push('...')
         xx.push(['.','.','.'])
     }
@@ -117,21 +123,24 @@ logist.ui=(div='logistDiv')=>{
         })
         */
     })
-    logist.showcaseLogist()
+    // continuous variables 
+    logist.vizLogist()
 }
 
-logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic regressions with iris
+logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions with iris
     if(typeof(div)=='string'){
         div=document.getElementById(div)
     }
     div=div||document.createElement('div')
-    if(div.id.length==0){div.id="showcaseLogistDiv"}
-    h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
+    if(div.id.length==0){div.id="vizLogistDiv"}
+    //h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
+    h='<h2>Logistic plot</h2>'
     h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="20"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt" onclick="logist.irisRegression()">Regression</button><br><span style="color:black;font-size:x-small">you can edit/paste in your own data</span></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
     // get iris data
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
-    div.species=[...new Set(showcaseLogistDiv.iris.map(x=>x.species))]
+    div.species=[...new Set(vizLogistDiv.iris.map(x=>x.species))]
+    h+='<h3>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</h3>'
     h+='<h3>Independent variable</h3>'
     div.indVars.forEach((k,i)=>{
         if(i==0){
@@ -155,7 +164,7 @@ logist.showcaseLogist=async(div="showcaseLogistDiv")=>{ // showcase logistic reg
     return div
 }
 
-logist.getIrisSelectionData=(div=document.getElementById("showcaseLogistDiv"))=>{
+logist.getIrisSelectionData=(div=document.getElementById("vizLogistDiv"))=>{
     //console.log(Date())
     const varName = [...div.getElementsByClassName('irisVar')].filter(x=>x.checked)[0].value
     const className = [...div.getElementsByClassName('irisSpecies')].filter(x=>x.checked)[0].value
@@ -262,16 +271,15 @@ logist.fun=function(x,P){
 }
 
 logist.vizRegressAllele=function(i){
-    let x = logist.dt.xx[i]
+    let x = logist.dt.x[i]
     // populate text area
-    let txt = `${logist.dt.alleles[i]}\tcase.vs.control`
+    let txt = `load\tcase.vs.control`
     x.forEach((xj,j)=>{
         txt+=`\n${xj}\t${logist.dt.y[j]}\tNaN`
     })
     dataArea.value=txt
     setTimeout(function(){irisRegressionBt.click()},100)
-    console.log(logist.dt.alleles[i],{x:x,y:logist.dt.y})
-
+    console.log(logist.dt.rows[i+1],{x:x,y:logist.dt.y})
 }
 
 logist.UnivarRegress=function(){
@@ -280,13 +288,13 @@ logist.UnivarRegress=function(){
     univariateRegressionDiv.innerHTML=''
     let ol = document.createElement('ol')
     univariateRegressionDiv.appendChild(ol)
-    logist.dt.alleles.forEach((al,i)=>{
+    logist.dt.y.forEach((_,i)=>{
         let li = document.createElement('li')
         ol.appendChild(li)
-        li.innerHTML=`${al} in preogress ...`
+        li.innerHTML=`${logist.dt.cols[i+1]} in progress ...`
         setTimeout(function(){
-            let P = fminsearch(logist.fun,[Math.random(),Math.random()],logist.dt.xx[i],logist.dt.y,{maxIter:10000,display:false})
-            li.innerHTML=`<span style="color:navy">${al}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
+            let P = fminsearch(logist.fun,[Math.random(),Math.random()],logist.dt.x[i],logist.dt.y,{maxIter:10000,display:false})
+            li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
         },i*100)
     })
 }
