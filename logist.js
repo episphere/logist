@@ -198,11 +198,36 @@ logist.irisPlot=(P,div)=>{
         obs.push(parseFloat(r[1]))
         pred.push(parseFloat(r[2]))
     })
+    // reduce to unique values
+    uxy={}
+    x.forEach((xi,i)=>{
+        let lb = [xi,obs[i],pred[i]].join(',')
+        if(!uxy[lb]){
+           uxy[lb]=0
+        }
+        uxy[lb]+=1
+    })
+    x=[]
+    obs=[]
+    pred=[]
+    let num=[]
+    Object.keys(uxy).forEach((lb,i)=>{
+        lb=JSON.parse(`[${lb}]`)
+        x.push(lb[0])
+        obs.push(lb[1])
+        pred.push(lb[2])
+        num.push(uxy[lb])
+    })
+    let nMax = Math.max(...num)
+
     traceObs = {
         x:x,
         y:obs,
         name:'observed',
-        mode: 'markers'
+        mode: 'markers',
+        marker:{
+            size:num.map(xi=>5+20*xi/nMax)
+        }
     }
     let mm = [Math.min(...x),Math.max(...x)]
     tracePred = {
@@ -273,7 +298,7 @@ logist.fun=function(x,P){
 logist.vizRegressAllele=function(i){
     let x = logist.dt.x[i]
     // populate text area
-    let txt = `load\tcase.vs.control`
+    let txt = `${logist.dt.cols[i+1]}\tcase.vs.control`
     x.forEach((xj,j)=>{
         txt+=`\n${xj}\t${logist.dt.y[j]}\tNaN`
     })
