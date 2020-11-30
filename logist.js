@@ -207,6 +207,8 @@ logist.irisPlot=(P,div)=>{
         }
         uxy[lb]+=1
     })
+    // Standard Error
+    let stErr = Math.sqrt(obs.map((ob,i)=>(ob-pred[i])**2).reduce((a,b)=>a+b))/obs.length
     x=[]
     obs=[]
     pred=[]
@@ -227,7 +229,8 @@ logist.irisPlot=(P,div)=>{
         mode: 'markers',
         marker:{
             size:num.map(xi=>5+20*xi/nMax)
-        }
+        },
+        text:num.map(n=>'n='+n)
     }
     let mm = [Math.min(...x),Math.max(...x)]
     tracePred = {
@@ -246,7 +249,7 @@ logist.irisPlot=(P,div)=>{
     }
     traces = [traceObs,tracePred]
     let parmTxt = Ylabel
-    if(P){parmTxt=`${Ylabel}<br><span style="font-size:x-small">P=${JSON.stringify(P.map(n=>n.toExponential(4))).replace(/"/g,'')}</span>`}
+    if(P){parmTxt=`${Ylabel}<br><span style="font-size:x-small">W<sub>0</sub>=${P[0].toString().slice(0,8)}, W<sub>1</sub>=${P[1].toString().slice(0,8)}, σ=${stErr.toString().slice(0,8)}</span>`}
     Plotly.newPlot(div,traces,{
         width: 500,
         title:parmTxt,
@@ -254,7 +257,7 @@ logist.irisPlot=(P,div)=>{
             title:Xlabel
         },
         yaxis:{
-            title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>-(P<sub>0</sub>+P<sub>1*</sub>x)</sup></sub></span>'
+            title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>-(W<sub>0</sub>+W<sub>1*</sub>x)</sup></sub></span>'
         }
     },{displayModeBar: false})
     return traces
