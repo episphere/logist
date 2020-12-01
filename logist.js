@@ -141,23 +141,23 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
     div.species=[...new Set(vizLogistDiv.iris.map(x=>x.species))]
-    h+='<h3>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</h3>'
-    h+='<h3>Independent variable</h3>'
+    h+='<p>Test logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</p>'
+    h+='<h3>Independent variable (sepal, petal length)</h3>'
     div.indVars.forEach((k,i)=>{
         if(i==0){
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" value="${k}" class="irisVar" onchange="logist.getIrisSelectionData()" checked=true>`
+            h+=`<input type="radio" id="${k}Radio" name="indVar" value="${k}" class="irisVar" onchange="logist.getIrisSelectionData()" checked=true> ${k}`
         }else{
-            h+=` ${k}:<input type="radio" id="${k}Radio" name="indVar" class="irisVar" onchange="logist.getIrisSelectionData()" value="${k}">`
+            h+=`<br><input type="radio" id="${k}Radio" name="indVar" class="irisVar" onchange="logist.getIrisSelectionData()" value="${k}"> ${k}`
         }        
     })
     h+='</p>'
-    h+='<h3>Classification</h3>'
-    h+='Species: '
+    h+='<h3>Classification (Species)</h3>'
+    //h+='Species: '
     div.species.forEach((k,i)=>{
         if(i==0){
-            h+=` <input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"checked=true>${k}`
+            h+=`<input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"checked=true> ${k}`
         }else{
-            h+=` <input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}">${k}`
+            h+=`<br><input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"> ${k}`
         }
     })
     div.innerHTML=h
@@ -317,13 +317,13 @@ logist.UnivarRegress=function(){
     univariateRegressionDiv.innerHTML=''
     let ol = document.createElement('ol')
     univariateRegressionDiv.appendChild(ol)
-    logist.dt.y.forEach((_,i)=>{
+    logist.dt.x.forEach((_,i)=>{
         let li = document.createElement('li')
         ol.appendChild(li)
         li.innerHTML=`${logist.dt.cols[i+1]} in progress ...`
         setTimeout(function(){
             let P = fminsearch(logist.fun,[Math.random(),Math.random()],logist.dt.x[i],logist.dt.y,{maxIter:10000,display:false})
             li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
-        },i*100)
+        },i*1000)
     })
 }
