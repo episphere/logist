@@ -132,7 +132,10 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
         div=document.getElementById(div)
     }
     div=div||document.createElement('div')
-    if(div.id.length==0){div.id="vizLogistDiv";document.body.appendChild(div)}
+    if(div.id.length==0){
+        div.id="vizLogistDiv"
+        document.body.appendChild(div)
+    }
     //h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
     h='<h2>Logistic plot</h2>'
     h+='<p>Load your own data, load Demo, or use <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set" target="_blank">reference</a> Iris dataset below.</p>'
@@ -140,7 +143,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
     // get iris data
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
-    div.species=[...new Set(vizLogistDiv.iris.map(x=>x.species))]
+    div.species=[...new Set(div.iris.map(x=>x.species))]
     h+='<p>Test logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</p>'
     h+='<h3>Independent variable (sepal, petal length)</h3>'
     div.indVars.forEach((k,i)=>{
@@ -317,13 +320,22 @@ logist.UnivarRegress=function(){
     univariateRegressionDiv.innerHTML=''
     let ol = document.createElement('ol')
     univariateRegressionDiv.appendChild(ol)
+    //logist.dt.x.slice(0,4).forEach((_,i)=>{
     logist.dt.x.forEach((_,i)=>{
         let li = document.createElement('li')
         ol.appendChild(li)
         li.innerHTML=`${logist.dt.cols[i+1]} in progress ...`
         setTimeout(function(){
             let P = fminsearch(logist.fun,[Math.random(),Math.random()],logist.dt.x[i],logist.dt.y,{maxIter:10000,display:false})
-            li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
+            let stErr= logist.stError(logist.dt.y,logist.fun(logist.dt.x[i],P))
+            li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue"> W<sub>0</sub>=${P[0].toString().slice(0,8)}, W<sub>1</sub>=${P[1].toString().slice(0,8)}, σ=${stErr.toString().slice(0,8)}</span>`           
+            //li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
         },i*1000)
     })
+}
+
+logist.stError=(obs,pred)=>{
+    return Math.sqrt(obs.map((ob,i)=>{
+        return (ob-pred[i])**2
+    }).reduce((a,b)=>a+b))/obs.length
 }

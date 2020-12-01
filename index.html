@@ -54,6 +54,7 @@
         }
         loadUrl.onclick=async function(){
             const txt = await (await fetch(dataUrl.value)).text()
+            //logistDiv.innerHTML='' // cleaup
             new logist(txt)
         }
         // look for file in hash
@@ -62,7 +63,10 @@
             dataLinkOut.hidden=false
             loadUrl.click()
         }else{
-            logist.vizLogist()
+            //dataUrl.value='test2.txt'
+            //loadUrl.click()
+            //logist.vizLogist()
+            loadDemoData.click()
         }
     </script>
 </body>
