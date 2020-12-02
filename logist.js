@@ -169,10 +169,15 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
     return div
 }
 
-logist.getIrisSelectionData=(div=document.getElementById("vizLogistDiv"))=>{
+logist.getIrisSelectionData=async(div=document.getElementById("vizLogistDiv"))=>{
     //console.log(Date())
-    const varName = [...div.getElementsByClassName('irisVar')].filter(x=>x.checked)[0].value
-    const className = [...div.getElementsByClassName('irisSpecies')].filter(x=>x.checked)[0].value
+    if(!div.iris){
+        div.iris = await (await fetch('../ai/data/iris.json')).json() 
+        div.indVars=Object.keys(div.iris[0]).slice(0,-1)
+        div.species=[...new Set(div.iris.map(x=>x.species))]
+    }
+    const varName = [...document.getElementsByClassName('irisVar')].filter(x=>x.checked)[0].value
+    const className = [...document.getElementsByClassName('irisSpecies')].filter(x=>x.checked)[0].value
     // fill text area
     let txt=`${varName}\t${className}\n`
     // sort array by value of selected variable
