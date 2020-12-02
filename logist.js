@@ -60,9 +60,10 @@ logist.ui=(div='logistDiv')=>{
     //h+=`<p>${logist.dt.chrs.length} chromossomes : ${logist.dt.cols.length-2} positions # x ${logist.dt.y.length} outcomes</p>`
     h+='<div id="dataPreviewDiv">...</div>'
     h+='<h2>Univariate Regression <button id="univariateRegressionButton" style="font-size:small;color:navy" onclick="logist.UnivarRegress()">Start</button></h2>'
+    h+=`<input type="range" min="0" max="${logist.dt.x.length}" value="0" id="regressionProgress" disabled="true">`
     h+='<div id="univariateRegressionDiv">...</div>'
     //h+='<h2>Logistic regression viz</h1>'
-    h+='<div id="vizLogistDiv">...</div>'
+    h+='<div id="vizLogistDiv"></div>'
     div.innerHTML=h
     let divR=document.getElementById('dataPreviewDiv')
     divR.innerHTML=''
@@ -315,12 +316,15 @@ logist.vizRegressAllele=function(i){
 }
 
 logist.UnivarRegress=function(){
-    console.log('univariate regression:\n--------------')
+    console.log('univariate regression started')
+    //console.log('univariate regression:\n--------------')
     univariateRegressionButton.hidden=true
     univariateRegressionDiv.innerHTML=''
     let ol = document.createElement('ol')
     univariateRegressionDiv.appendChild(ol)
     //logist.dt.x.slice(0,4).forEach((_,i)=>{
+
+    /*
     logist.dt.x.forEach((_,i)=>{
         let li = document.createElement('li')
         ol.appendChild(li)
@@ -332,6 +336,23 @@ logist.UnivarRegress=function(){
             //li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue">[ ${P.join(' , ')} ]</span>`           
         },i*1000)
     })
+    */
+    let regress = function(i){
+        if(i<logist.dt.x.length){
+        //if(i<4){
+            let li = document.createElement('li')
+            ol.appendChild(li)
+            li.innerHTML=`${logist.dt.cols[i+1]} in progress ...`
+            let P = fminsearch(logist.fun,[Math.random(),Math.random()],logist.dt.x[i],logist.dt.y,{maxIter:10000,display:false})
+            let stErr= logist.stError(logist.dt.y,logist.fun(logist.dt.x[i],P))
+            li.innerHTML=`<span style="color:navy">${logist.dt.cols[i+1]}</span> <span style="color:blue"> W<sub>0</sub>=${P[0].toString().slice(0,8)}, W<sub>1</sub>=${P[1].toString().slice(0,8)}, σ=${stErr.toString().slice(0,8)}</span>`
+            setTimeout(function(){regress(i+1)},10)
+        }else{
+            console.log('univariate regression ended')
+        }
+        regressionProgress.value=i
+    }
+    regress(0)
 }
 
 logist.stError=(obs,pred)=>{
