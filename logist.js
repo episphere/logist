@@ -124,7 +124,7 @@ logist.ui=(div='logistDiv')=>{
         */
     })
     // continuous variables 
-    logist.vizLogist()
+    // logist.vizLogist()
 }
 
 logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions with iris
