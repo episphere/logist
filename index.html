@@ -59,15 +59,13 @@
             new logist(txt)
         }
         // look for file in hash
+        logist.vizLogist()
         if(location.hash.length>2){
-            dataUrl.value=location.hash.slice(1)
-            dataLinkOut.hidden=false
-            loadUrl.click()
-        }else{
-            //dataUrl.value='test2.txt'
-            //loadUrl.click()
-            logist.vizLogist()
-            //loadDemoData.click()
+            setTimeout(function(){
+                dataUrl.value=location.hash.slice(1)
+                dataLinkOut.hidden=false
+                loadUrl.click()
+            },1000)
         }
     </script>
 </body>

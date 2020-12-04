@@ -304,7 +304,6 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
 }
 
 logist.fun=function(x,P){
-    //return P[0]/(1+Math.exp(P[1]*x-P[2]))
     return x.map(xi=>1/(1+Math.exp(-(P[0]+(P[1]*xi)))))
 }
 
