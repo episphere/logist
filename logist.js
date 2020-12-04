@@ -192,12 +192,12 @@ logist.allIris=async(div="allIrisDiv")=>{
             let P = fminsearch(logist.fun,[Math.random(),Math.random()],x,y,{maxIter:10000,display:false})
             let stErr = logist.stError(y,logist.fun(x,P))
             //let P = [1,2,3]
-            //h+=`<tr><td align="right"><b>${sp}&#8592;</b></td><td>${vr}:</td><td>${P[0].toString().slice(0,6)}</td><td>${P[1].toString().slice(0,6)}</td><td>${stErr.toString().slice(0,6)}</td></tr>`
+            h+=`<tr><td align="right"><b>${sp}&#8592;</b></td><td>${vr}:</td><td>${P[0].toString().slice(0,6)}</td><td>${P[1].toString().slice(0,6)}</td><td>${stErr.toString().slice(0,6)}</td></tr>`
         })
             
     })
     h+=`<\table>`
-    console.log(h)
+    //console.log(h)
 
     divRegressAllIris.innerHTML=h
 
