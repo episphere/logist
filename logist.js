@@ -164,7 +164,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
             h+=`<br><input type="radio" id="${k}Radio" name="speciesVar" class="irisSpecies" onchange="logist.getIrisSelectionData()" value="${k}"> ${k}`
         }
     })
-    h+=`<h3><button id="allIrisBt" onclick="logist.allIris()">Regress all combinations</button></h3><div id="allIrisDiv"></div>`
+    h+=`<h3><button id="allIrisBt" onclick="logist.allIris()">Regress all combinations</button></h3><div id="allIrisDiv">...</div>`
     div.innerHTML=h
     setTimeout(logist.getIrisSelectionData,100)
     return div
@@ -172,6 +172,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
 
 logist.allIris=async(div="allIrisDiv")=>{
     //console.log('allIris')
+    const round=(x,n=4)=>(Math.round(x*(10**n))/(10**n))
     if(typeof(div)=='string'){div=document.getElementById(div)}
     div.innerHTML=''
     if(!div.iris){
@@ -184,15 +185,16 @@ logist.allIris=async(div="allIrisDiv")=>{
 
     let h='<p>Univariate logistic regression of the Iris data</p>'
     h +='<table>'
-    h+='<tr><th style="text-align:right">species=</th><th>logist(parm)</th><th>w<sub>0</sub></th><th>w<sub>1</sub></th><th>St Error</th></tr>'
+    h+='<tr><th style="text-align:right">species=</th><th>logist(parm)</th><th style="text-align:center">w<sub>0</sub></th><th style="text-align:center">w<sub>1</sub></th><th>St Error</th></tr>'
     div.species.forEach(sp=>{
         div.indVars.forEach(vr=>{
-            let x = div.iris.map(x=>x[vr])
-            let y = div.iris.map(x=>x.species).map(x=>1*(x==sp))
-            let P = fminsearch(logist.fun,[Math.random(),Math.random()],x,y,{maxIter:10000,display:false})
-            let stErr = logist.stError(y,logist.fun(x,P))
+            const x = div.iris.map(x=>x[vr])
+            const y = div.iris.map(x=>x.species).map(s=>1*(s==sp))
+            const P = fminsearch(logist.fun,[Math.random(),Math.random()],x,y,{maxIter:10000,display:false})
+            const pred = logist.fun(x,P)
+            const stErr = logist.stError(y,pred)
             //let P = [1,2,3]
-            h+=`<tr><td align="right"><b>${sp}&#8592;</b></td><td>${vr}:</td><td>${P[0].toString().slice(0,6)}</td><td>${P[1].toString().slice(0,6)}</td><td>${stErr.toString().slice(0,6)}</td></tr>`
+            h+=`<tr><td align="right"><b>${sp} &#8592;</b></td><td>${vr}:</td><td>${round(P[0])}</td><td>${round(P[1])}</td><td>${round(stErr)}</td></tr>`
         })
             
     })
