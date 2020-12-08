@@ -140,7 +140,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
     //h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
     h='<h2>Logistic plot</h2>'
     h+='<p>Load your own data, load Demo, or use <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set" target="_blank">reference</a> Iris dataset below.</p>'
-    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="20"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt" onclick="logist.irisRegression()">Regression</button><br><span style="color:black;font-size:x-small">you can edit/paste in your own data</span></td><td id="plotTD"><div id="irisPlotDiv"></div></td></tr></table>'
+    h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="20"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt" onclick="logist.irisRegression()">Regression</button><br><span style="color:black;font-size:x-small">you can edit/paste in your own data</span></td><td id="plotTD" align="center"><div id="irisPlotDiv"></div><span id="plotParms" style="color:darkgreen">W<sub>0</sub>:<input id="w0"size=8 style="font-size:small"> W<sub>1</sub>:<input id="w1" size=8 style="font-size:small"> <button id="plotMore" onclick="logist.plotMore()">Plot</button><span id="customErr"> σ:</span></span></td></tr></table>'
     // get iris data
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
@@ -246,6 +246,7 @@ logist.irisPlot=(P,div)=>{
         obs.push(parseFloat(r[1]))
         pred.push(parseFloat(r[2]))
     })
+    logist.irisPlot.obs=obs
     // reduce to unique values
     uxy={}
     x.forEach((xi,i)=>{
@@ -298,8 +299,9 @@ logist.irisPlot=(P,div)=>{
     traces = [traceObs,tracePred]
     let parmTxt = Ylabel
     if(P){parmTxt=`${Ylabel}<br><span style="font-size:x-small">W<sub>0</sub>=${P[0].toString().slice(0,8)}, W<sub>1</sub>=${P[1].toString().slice(0,8)}, σ=${stErr.toString().slice(0,8)}</span>`}
-    Plotly.newPlot(div,traces,{
+    let layout = {
         width: 500,
+        height: 430,
         title:parmTxt,
         xaxis:{
             title:Xlabel
@@ -307,7 +309,10 @@ logist.irisPlot=(P,div)=>{
         yaxis:{
             title:'y= <span style="font-size:large"><sup>1</sup>/<sub>1+e<sup>-(W<sub>0</sub>+W<sub>1*</sub>x)</sup></sub></span>'
         }
-    },{displayModeBar: false})
+    }
+    Plotly.newPlot(div,traces,layout,{displayModeBar: false})
+    logist.irisPlot.traces=traces
+    logist.irisPlot.layout=layout
     return traces
 }
 
@@ -338,6 +343,8 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
     ta.P=P
     ta.value=txt
     logist.irisPlot(P)
+    document.getElementById('w0').value=P[0]
+    document.getElementById('w1').value=P[1]
     return ta
 }
 
@@ -395,6 +402,26 @@ logist.UnivarRegress=function(){
         regressionProgress.value=i
     }
     regress(0)
+}
+
+logist.plotMore=()=>{ // add an additional model
+    let traces = logist.irisPlot.traces
+    P=[document.getElementById('w0').value,document.getElementById('w1').value].map(x=>parseFloat(x))
+    traces[2]={
+        x:traces[1].x,
+        y:logist.fun(traces[1].x,P),
+        mode:'lines',
+        name:'custom',
+        line:{
+            color:'green',
+            dash: 'dot'
+        }
+    }
+    const pred = logist.fun(traces[2].x,P)
+    const stErr = logist.stError(logist.irisPlot.obs,pred)
+    customErr.innerHTML=` σ: ${stErr}`
+    Plotly.newPlot(document.getElementById('irisPlotDiv'),traces,logist.irisPlot.layout)
+    //debugger
 }
 
 logist.stError=(obs,pred)=>{
