@@ -145,7 +145,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
     div.iris = await (await fetch('../ai/data/iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
     div.species=[...new Set(div.iris.map(x=>x.species))]
-    h+='<p>Test logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</p>'
+    h+='<p>Test with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</p>'
     h+='<h3>Independent variable (sepal, petal length)</h3>'
     div.indVars.forEach((k,i)=>{
         if(i==0){
