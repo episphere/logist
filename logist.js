@@ -246,7 +246,9 @@ logist.irisPlot=(P,div)=>{
         obs.push(parseFloat(r[1]))
         pred.push(parseFloat(r[2]))
     })
+    logist.irisPlot.x=x
     logist.irisPlot.obs=obs
+    logist.irisPlot.pred=pred
     // reduce to unique values
     uxy={}
     x.forEach((xi,i)=>{
@@ -257,7 +259,8 @@ logist.irisPlot=(P,div)=>{
         uxy[lb]+=1
     })
     // Standard Error
-    let stErr = Math.sqrt(obs.map((ob,i)=>(ob-pred[i])**2).reduce((a,b)=>a+b))/obs.length
+    //let stErr = Math.sqrt(obs.map((ob,i)=>(ob-pred[i])**2).reduce((a,b)=>a+b))/obs.length
+    let stErr = logist.stError(obs,pred)
     x=[]
     obs=[]
     pred=[]
@@ -338,7 +341,7 @@ logist.irisRegression=function(ta = document.getElementById('dataArea')){
     let yp = logist.fun(x,P)
     let txt = dtxt[0].join('\t')
     x.forEach((xi,i)=>{
-        txt +=`\n${xi}\t${y[i]}\t${(Math.round(yp[i]*1000)/1000).toString()}`
+        txt +=`\n${xi}\t${y[i]}\t${(Math.round(yp[i]*1000000)/1000000).toString()}`
     })
     ta.P=P
     ta.value=txt
@@ -417,7 +420,7 @@ logist.plotMore=()=>{ // add an additional model
             dash: 'dot'
         }
     }
-    const pred = logist.fun(traces[2].x,P)
+    const pred = logist.fun(logist.irisPlot.x,P)
     const stErr = logist.stError(logist.irisPlot.obs,pred)
     customErr.innerHTML=` σ: ${stErr}`
     Plotly.newPlot(document.getElementById('irisPlotDiv'),traces,logist.irisPlot.layout)
