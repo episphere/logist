@@ -146,6 +146,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
     div.species=[...new Set(div.iris.map(x=>x.species))]
     h+='<p>Test with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</p>'
+    h+='<table><tr><td id="irisSelectTD">'
     h+='<h3>Independent variable (sepal, petal length)</h3>'
     div.indVars.forEach((k,i)=>{
         if(i==0){
@@ -165,6 +166,7 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
         }
     })
     h+=`<h3><button id="allIrisBt" onclick="logist.allIris()">Regress all combinations</button></h3><div id="allIrisDiv">...</div>`
+    h+='</td><td id="tfTD"></td></tr></table>'
     div.innerHTML=h
     setTimeout(logist.getIrisSelectionData,100)
     return div
