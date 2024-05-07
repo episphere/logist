@@ -137,15 +137,15 @@ logist.vizLogist=async(div="vizLogistDiv")=>{ // showcase logistic regressions w
         div.id="vizLogistDiv"
         document.body.appendChild(div)
     }
-    //h='<h2>Showcasing logistic regression with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a></h2>'
+    //h='<h2>Showcasing logistic regression with the <a href="./iris.json" target="_blank">iris dataset</a></h2>'
     h='<h2>Logistic plot</h2>'
     h+='<p>Load your own data, load Demo, or use <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set" target="_blank">reference</a> Iris dataset below.</p>'
     h+='<table><tr><td id="dataTd"><textarea id="dataArea" rows="20"></textarea><br><button id="irisPlotBt" onclick="logist.irisPlot()">Plot</button> <button id="irisRegressionBt" onclick="logist.irisRegression()">Regression</button><br><span style="color:black;font-size:x-small">you can edit/paste in your own data</span></td><td id="plotTD" align="center"><div id="irisPlotDiv"></div><span id="plotParms" style="color:darkgreen">W<sub>0</sub>:<input id="w0"size=8 style="font-size:small"> W<sub>1</sub>:<input id="w1" size=8 style="font-size:small"> <button id="plotMore" onclick="logist.plotMore()">Plot</button><span id="customErr"> σ:</span></span></td></tr></table>'
     // get iris data
-    div.iris = await (await fetch('../ai/data/iris.json')).json() 
+    div.iris = await (await fetch('./iris.json')).json() 
     div.indVars=Object.keys(div.iris[0]).slice(0,-1)
     div.species=[...new Set(div.iris.map(x=>x.species))]
-    h+='<p>Test with the <a href="../ai/data/iris.json" target="_blank">iris dataset</a>:</p>'
+    h+='<p>Test with the <a href="./iris.json" target="_blank">iris dataset</a>:</p>'
     h+='<table><tr><td id="irisSelectTD">'
     h+='<h3>Independent variable (sepal, petal length)</h3>'
     div.indVars.forEach((k,i)=>{
@@ -178,7 +178,7 @@ logist.allIris=async(div="allIrisDiv")=>{
     if(typeof(div)=='string'){div=document.getElementById(div)}
     div.innerHTML=''
     if(!div.iris){
-        div.iris = await (await fetch('../ai/data/iris.json')).json() 
+        div.iris = await (await fetch('./iris.json')).json() 
         div.indVars=Object.keys(div.iris[0]).slice(0,-1)
         div.species=[...new Set(div.iris.map(x=>x.species))]
     }
@@ -212,7 +212,7 @@ logist.allIris=async(div="allIrisDiv")=>{
 logist.getIrisSelectionData=async(div=document.getElementById("vizLogistDiv"))=>{
     //console.log(Date())
     if(!div.iris){
-        div.iris = await (await fetch('../ai/data/iris.json')).json() 
+        div.iris = await (await fetch('./iris.json')).json() 
         div.indVars=Object.keys(div.iris[0]).slice(0,-1)
         div.species=[...new Set(div.iris.map(x=>x.species))]
     }
@@ -427,6 +427,55 @@ logist.plotMore=()=>{ // add an additional model
     customErr.innerHTML=` σ: ${stErr}`
     Plotly.newPlot(document.getElementById('irisPlotDiv'),traces,logist.irisPlot.layout)
     //debugger
+}
+
+logist.synt=function(){
+    console.log('synt')
+    //let syntBt = document.getElementById('syntBt')
+    syntBt.onclick=function(){
+        if(syntBt.textContent=='Open'){
+            syntBt.textContent='Close'
+            syntBt.style.color='red'
+            syntDiv.hidden=false
+        }else{
+            syntBt.textContent='Open'
+            syntBt.style.color='green'
+            syntDiv.hidden=true
+        }
+    }
+    // generate
+    let P // people
+    genBt.onclick=function(){
+        P=[] // reset
+        let n = nn.value
+        let W0s = W0.value.split(',').map(x=>parseFloat(x))
+        let W1s = W1.value.split(',').map(x=>parseFloat(x))
+        let m = W0s.length  // variants
+        let sim={} // simulation
+        sim.W0=W0s
+        sim.W1=W1s
+        sim.noise=parseFloat(noise.value)
+        let rdi = parseFloat(pCase.value) // random value
+        // create one person at a time
+        for(let i=0;i<n;i++){
+            if(Math.random()<rdi){ // case
+                P[i]={case:1}
+            }else{
+                P[i]={case:0}
+            }
+            if((P[i].case)&(Math.random()<rdi)){
+                P[i].case=2
+            }
+            P[i].PID=`PID_${i}`
+            
+            // simulate
+            for(let j=0;j<m;j++){
+                
+            }
+        }
+        sim.P=P
+        console.log(sim)
+    }
 }
 
 logist.stError=(obs,pred)=>{
