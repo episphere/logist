@@ -16,7 +16,7 @@
     <p>Experimenting with in-browser logistic regression</p>
     <h2>Load Data</h2>
     <p>
-    URL <input size=30 id="dataUrl" style="color:green"> <button id="loadUrl">load url</button> <span id="dataLinkOut" style="color:blue;cursor:pointer" hidden=true>&#8599;</span> <button id="loadDemoData">Demo</button>
+    URL <input size=30 id="dataUrl" style="color:green"> <button id="loadUrl">load url</button> <span id="dataLinkOut" style="color:blue;cursor:pointer" hidden=true>&#8599;</span> <button id="loadDemoData">Demo</button> <button id="loadRead">Read</button>
     <br>Box id <input> <button>Load from Box</button> (under dev)
     <br><input type="file" id="loadFile"> 
     </p>
@@ -60,6 +60,7 @@
         }
         loadUrl.onclick=async function(){
             const txt = await (await fetch(dataUrl.value)).text()
+            syntTA.value=txt
             //logistDiv.innerHTML='' // cleaup
             new logist(txt)
         }
